@@ -16,10 +16,9 @@ class CreateClientFormsTable extends Migration
     {
         if(!Schema::hasTable('client_forms')) {
             Schema::create('client_forms', function (Blueprint $table) {
-                $table->bigIncrements('id');
-                $table->integer('client_forms_id');
+                $table->increments('client_forms_id');
                 $table->integer('client_id');
-                $table->bigInteger('form_id')->unsigned();
+                $table->integer('form_id')->unsigned();
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
             });

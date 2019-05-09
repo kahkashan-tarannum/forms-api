@@ -16,7 +16,7 @@ class CreateFormsTable extends Migration
     {
         if(!Schema::hasTable('forms')) {
             Schema::create('forms', function (Blueprint $table) {
-                $table->bigIncrements('form_id')->unsigned();
+                $table->increments('form_id')->unsigned();
                 $table->string('title');
                 $table->string('device_type');
                 $table->string('form_type');
