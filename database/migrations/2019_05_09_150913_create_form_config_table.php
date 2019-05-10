@@ -19,7 +19,7 @@ class CreateFormConfigTable extends Migration
                 $table->increments('form_config_id');
                 $table->integer('version');
                 $table->string('config');
-                $table->boolean('is_active');
+                $table->boolean('is_active')->default(true);
                 $table->integer('form_id')->unsigned();
                 $table->timestamp('created_at')->useCurrent();
                 $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));

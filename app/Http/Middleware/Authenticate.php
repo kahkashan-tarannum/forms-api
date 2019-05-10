@@ -2,8 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Users;
 use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Contracts\Auth\Factory as Auth;
+use App\Repositories\AuthRepository;
 
 class Authenticate
 {
@@ -20,7 +23,7 @@ class Authenticate
      * @param  \Illuminate\Contracts\Auth\Factory  $auth
      * @return void
      */
-    public function __construct(Auth $auth)
+    public function __construct(AuthRepository $auth)
     {
         $this->auth = $auth;
     }
@@ -35,10 +38,18 @@ class Authenticate
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        if ($this->auth->guard($guard)->guest()) {
-            return response('Unauthorized.', 401);
+        $username = $request->header('username');
+        $password = $request->header('password');
+        if(isset($username) && isset($password)) {
+            $user = Users::where('username', '=',$username)->first();
         }
+//        $result = $this->auth->verifyAuth($username,$password);
+        if($user === null) {
+            return ([Response::HTTP_NO_CONTENT, 'Invalid username or Password']);
+        }
+        else {
+            return $next($request);
 
-        return $next($request);
+        }
     }
 }
