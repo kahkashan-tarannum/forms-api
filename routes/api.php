@@ -21,7 +21,7 @@ $router->get('/', function () use ($router) {
 Route::group(['prefix'=>'/api','middleware' => 'auth'], function(){
     Route::post('/FormDefinition', 'FormsController@createForm');
     Route::get('/FormDefinition/{}/{}', 'FormsController@getFormsByID');
-    Route::get('/FormDefinition/{}', 'FormsController@getAllForms');
+    Route::get('/FormDefinition/{clientId}', 'FormsController@getAllForms');
     Route::post('/FormDefinition/{formId}', 'FormsController@updateForm');
 //    Route::post('/FormDefinition/{formId}', 'FormsController@disableForm');
     Route::delete('/FormDefinition/{formId}', 'FormsController@delete');

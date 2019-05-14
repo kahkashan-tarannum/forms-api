@@ -3,19 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Forms;
-use App\Models\FormConfig;
-use App\Models\ClientForms;
 use Illuminate\Support\Facades\DB;
 
 class FormsController extends Controller
 {
-    private $request;
     private $form_id;
 
     public function createForm(Request $request)
     {
-        //echo $request;
         $request=$request->getContent();
         $request_data=json_decode($request);
         $id = DB::table ('forms') ->insertGetId(
@@ -35,13 +30,11 @@ class FormsController extends Controller
                 'is_active' => $is_active,
                 'form_id' => $id
             ]
-
         );
         DB::table ('client_forms') ->insert(
             [   'client_id' => $request_data->clientId,
                 'form_id' => $id
             ]
-
         );
     }
 
@@ -50,9 +43,30 @@ class FormsController extends Controller
 
     }
 
-    public function getAllForms()
+    public function getAllForms(Request $request,$clientId)
     {
-
+        $data = DB::table('client_forms')
+            ->join('forms', 'client_forms.form_id', '=', 'forms.form_id')
+            ->join('form_config', 'client_forms.form_id', '=', 'form_config.form_id')
+            ->where('client_forms.client_id',$clientId)
+            ->select('form_config.form_id',
+                'client_forms.client_id',
+                'client_forms.client_forms_id',
+                'forms.title',
+                'forms.form_type',
+                'forms.device_type',
+                DB::raw("MAX(form_config.version) as version"),
+                'form_config.config')
+            ->groupBy('form_config.form_id',
+                'client_forms.client_id',
+                'client_forms.client_forms_id',
+                'forms.title',
+                'forms.form_type',
+                'forms.device_type',
+                'form_config.config')
+            ->get();
+        $form_data= json_encode($data);
+        return $form_data;
     }
 
     public function updateForm(Request $request,$formId)
@@ -63,7 +77,7 @@ class FormsController extends Controller
         {
             $this->disableForm($request,$formId,$isDisable);
         }
-        else{dd('here');
+        else{
             $request=$request->getContent();
             $request_data=json_decode($request);
             $data = DB::table('form_config')->where('form_id', $formId)->orderBy('version', 'desc')->first();
@@ -76,7 +90,6 @@ class FormsController extends Controller
                     'form_id' => $data->form_id
                 ]
             );
-
             DB::table('form_config')
                 ->where('form_id', $data->form_id)
                 ->where('version',$data->version)
@@ -92,14 +105,11 @@ class FormsController extends Controller
                 ->update(['is_active' => 0]);
         }else{
             $data = DB::table('form_config')->where('form_id', $formId)->orderBy('version', 'desc')->first();
-
             DB::table('form_config')
                 ->where('form_id', $formId)
                 ->where('version',$data->version)
                 ->update(['is_active' => 1]);
-
         }
-
     }
 
     public function delete(Request $request,$formId)
