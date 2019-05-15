@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FormsController extends Controller
 {
@@ -117,5 +118,6 @@ class FormsController extends Controller
         DB::table('forms')->where('form_id', '=', $formId)->delete();
         DB::table('form_config')->where('form_id', '=', $formId)->delete();
         DB::table('client_forms')->where('form_id', '=', $formId)->delete();
+        Log::channel('single')->info("exiting delete method");
     }
 }
